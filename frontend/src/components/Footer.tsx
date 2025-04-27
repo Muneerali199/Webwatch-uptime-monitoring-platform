@@ -42,7 +42,7 @@ export const Footer: React.FC = () => {
           <div className="col-span-2">
             <a href="#" className="flex items-center gap-2 mb-6">
               <Activity size={24} className="text-primary" />
-              <span className="font-bold text-xl tracking-tight">DPIN</span>
+              <span className="font-bold text-xl tracking-tight">WEBWATCH</span>
             </a>
             <p className="text-gray-400 mb-6">
               Advanced uptime monitoring for your applications and services.

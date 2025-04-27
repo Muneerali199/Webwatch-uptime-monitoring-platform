@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Activity, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/Button';
+import { 
+  SignedIn, 
+  SignedOut, 
+  UserButton, 
+  SignInButton, 
+  SignUpButton 
+} from '@clerk/clerk-react';
 
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,7 +43,7 @@ export const Header: React.FC = () => {
           <span className="text-primary">
             <Activity size={32} className="text-primary" />
           </span>
-          <span className="font-bold text-xl tracking-tight">DPIN</span>
+          <span className="font-bold text-xl tracking-tight">Webwatch</span>
         </a>
 
         {/* Desktop Navigation */}
@@ -54,9 +61,26 @@ export const Header: React.FC = () => {
               </li>
             ))}
           </ul>
-          <div className="flex gap-4">
-            <Button variant="default" size="sm">Log In</Button>
-            <Button variant="gradient" size="sm" glowing>Try for Free</Button>
+          <div className="flex gap-4 items-center">
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-8 h-8",
+                    userButtonPopoverCard: "bg-background border border-white/10",
+                  }
+                }}
+                afterSignOutUrl="/"
+              />
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="default" size="sm">Log In</Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button variant="gradient" size="sm" glowing>Try for Free</Button>
+              </SignUpButton>
+            </SignedOut>
           </div>
         </nav>
 
@@ -94,8 +118,25 @@ export const Header: React.FC = () => {
                 ))}
               </ul>
               <div className="flex flex-col gap-3 mt-6">
-                <Button variant="default" fullWidth>Log In</Button>
-                <Button variant="gradient" fullWidth glowing>Try for Free</Button>
+                <SignedIn>
+                  <UserButton 
+                    afterSignOutUrl="/"
+                    appearance={{
+                      elements: {
+                        userButtonTrigger: "w-full justify-start",
+                        userButtonAvatarBox: "w-8 h-8",
+                      }
+                    }}
+                  />
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button variant="default" fullWidth>Log In</Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button variant="gradient" fullWidth glowing>Try for Free</Button>
+                  </SignUpButton>
+                </SignedOut>
               </div>
             </div>
           </motion.div>
