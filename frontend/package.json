@@ -8,9 +8,9 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.30.0",
-    "@nextui-org/react": "latest",
+    "@nextui-org/react": "^2.6.11",
     "@react-spring/web": "^9.7.3",
-    "@react-three/drei": "^10.0.7",
+    "@react-three/drei": "^9.87.1",
     "@react-three/fiber": "^9.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -19,13 +19,14 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^5.0.0",
+    "react-router-dom": "^7.5.2",
     "tailwind-merge": "^2.1.0",
     "three": "^0.159.0",
     "three-globe": "^2.42.4"
   },
   "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
     "@types/three": "^0.176.0",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
