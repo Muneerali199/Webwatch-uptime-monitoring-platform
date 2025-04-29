@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -6,7 +7,7 @@ import WebsiteCard from '../components/WebsiteCard';
 import { 
   Plus, Search, Filter, RefreshCw, LayoutDashboard, 
   Activity, AlertTriangle, LineChart, ChevronRight,
-  CheckCircle
+  CheckCircle, X
 } from 'lucide-react';
 import { 
   LineChart as RechartsLineChart, 
@@ -15,10 +16,9 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend,
   ResponsiveContainer 
 } from 'recharts';
-import { motion, MotionProps } from 'framer-motion';
+import { motion, AnimatePresence, MotionProps } from 'framer-motion';
 import { cn } from '../lib/utils';
 
 type Tab = 'overview' | 'performance' | 'incidents';
@@ -26,12 +26,26 @@ type Tab = 'overview' | 'performance' | 'incidents';
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & 
   MotionProps & {
     className?: string;
-    icon?: React.ComponentType<{ size?: number; className?: string }>;
+    icon?: React.ComponentType<{ size?: string | number; className?: string }>;
     iconPosition?: 'left' | 'right';
   };
 
+type Website = {
+  id: string;
+  name: string;
+  url: string;
+  status: 'up' | 'down';
+  uptime: number;
+  responseTime: number;
+  lastChecked: string;
+  history: Array<{
+    timestamp: number;
+    status: 'up' | 'down';
+  }>;
+};
+
 const DashboardPage: React.FC = () => {
-  const [websites] = useState(mockWebsites);
+  const [websites, setWebsites] = useState<Website[]>(mockWebsites);
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
@@ -39,9 +53,20 @@ const DashboardPage: React.FC = () => {
   const [messages, setMessages] = useState<Array<{text: string, sender: 'user' | 'bot'}>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isBotTyping, setIsBotTyping] = useState(false);
+  const [isAddWebsiteOpen, setIsAddWebsiteOpen] = useState(false);
+  const [newWebsite, setNewWebsite] = useState({
+    name: '',
+    url: ''
+  });
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    url: ''
+  });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [websiteToDelete, setWebsiteToDelete] = useState<Website | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // Sample bot responses
   const botResponses = [
     "I'm analyzing your website data now...",
     "Your performance metrics look good overall!",
@@ -96,13 +121,11 @@ const DashboardPage: React.FC = () => {
   const handleSendMessage = () => {
     if (inputMessage.trim() === '') return;
     
-    // Add user message
     const newMessage = {text: inputMessage, sender: 'user' as const};
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setIsBotTyping(true);
     
-    // Simulate bot thinking
     setTimeout(() => {
       const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
       setMessages(prev => [...prev, {text: randomResponse, sender: 'bot'}]);
@@ -116,9 +139,121 @@ const DashboardPage: React.FC = () => {
     }
   };
 
+  const handleDeleteWebsite = (id: string) => {
+    const website = websites.find(w => w.id === id);
+    if (website) {
+      setWebsiteToDelete(website);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDeleteWebsite = () => {
+    if (websiteToDelete) {
+      setWebsites(prev => prev.filter(website => website.id !== websiteToDelete.id));
+      setIsDeleteModalOpen(false);
+      setWebsiteToDelete(null);
+    }
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        if (isAddWebsiteOpen) {
+          setIsAddWebsiteOpen(false);
+        } else if (isDeleteModalOpen) {
+          setIsDeleteModalOpen(false);
+          setWebsiteToDelete(null);
+        }
+      }
+    };
+
+    if (isAddWebsiteOpen || isDeleteModalOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAddWebsiteOpen, isDeleteModalOpen]);
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = {
+      name: '',
+      url: ''
+    };
+
+    if (!newWebsite.name.trim()) {
+      newErrors.name = 'Website name is required';
+      valid = false;
+    }
+
+    if (!newWebsite.url.trim()) {
+      newErrors.url = 'Website URL is required';
+      valid = false;
+    } else if (!isValidUrl(newWebsite.url)) {
+      newErrors.url = 'Please enter a valid URL (include http:// or https://)';
+      valid = false;
+    }
+
+    setFormErrors(newErrors);
+    return valid;
+  };
+
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  };
+
+  const handleAddWebsite = () => {
+    if (!validateForm()) return;
+
+    const newSite: Website = {
+      id: `site-${Date.now()}`,
+      name: newWebsite.name,
+      url: newWebsite.url,
+      status: 'up',
+      uptime: 99.9,
+      responseTime: Math.floor(Math.random() * 200) + 100,
+      lastChecked: new Date().toISOString(),
+      history: [
+        {
+          timestamp: Date.now(),
+          status: 'up'
+        }
+      ]
+    };
+
+    setWebsites(prev => [...prev, newSite]);
+    setNewWebsite({ name: '', url: '' });
+    setIsAddWebsiteOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewWebsite(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (formErrors[name as keyof typeof formErrors]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
 
   const PrimaryButton: React.FC<ButtonProps> = ({ 
     children, 
@@ -340,18 +475,171 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 h-[calc(100vh-64px)] overflow-y-auto">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
+    <div className="container mx-auto px-4 py-4 h-[calc(100vh-64px)] overflow-y-auto">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-sm text-gray-400">
             Monitor your website performance and incidents
           </p>
         </div>
-        <PrimaryButton icon={Plus} className="text-sm">
+        <PrimaryButton 
+          icon={Plus} 
+          className="text-sm"
+          onClick={() => setIsAddWebsiteOpen(true)}
+        >
           Add Website
         </PrimaryButton>
       </div>
+
+      {/* Add Website Modal */}
+      <AnimatePresence>
+        {isAddWebsiteOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              ref={modalRef}
+              className="DEEDEDrelative bg-gray-900 rounded-xl border border-gray-800 shadow-2xl overflow-hidden w-full max-w-md"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            >
+              <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Add New Website</h2>
+                <button 
+                  onClick={() => setIsAddWebsiteOpen(false)}
+                  className="p-1 rounded-full hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                      Website Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={newWebsite.name}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-2 rounded-lg bg-gray-800 border ${formErrors.name ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white outline-none transition-all`}
+                      placeholder="My Awesome Site"
+                    />
+                    {formErrors.name && (
+                      <p className="mt-1 text-xs text-red-400">{formErrors.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="url" className="block text-sm font-medium text-gray-300 mb-1">
+                      Website URL
+                    </label>
+                    <input
+                      type="text"
+                      id="url"
+                      name="url"
+                      value={newWebsite.url}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-2 rounded-lg bg-gray-800 border ${formErrors.url ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white outline-none transition-all`}
+                      placeholder="https://example.com"
+                    />
+                    {formErrors.url && (
+                      <p className="mt-1 text-xs text-red-400">{formErrors.url}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-gray-800 flex justify-end gap-3">
+                <SecondaryButton 
+                  onClick={() => setIsAddWebsiteOpen(false)}
+                  className="px-4 py-2 text-sm"
+                >
+                  Cancel
+                </SecondaryButton>
+                <PrimaryButton 
+                  onClick={handleAddWebsite}
+                  className="px-4 py-2 text-sm"
+                >
+                  Add Website
+                </PrimaryButton>
+              </div>
+
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+              <div className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full bg-blue-500/10 blur-3xl"></div>
+              <div className="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-indigo-500/10 blur-3xl"></div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {isDeleteModalOpen && websiteToDelete && (
+          <motion.div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              ref={modalRef}
+              className="relative bg-gray-900 rounded-xl border border-gray-800 shadow-2xl overflow-hidden w-full max-w-md"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            >
+              <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Delete Website</h2>
+                <button
+                  onClick={() => {
+                    setIsDeleteModalOpen(false);
+                    setWebsiteToDelete(null);
+                  }}
+                  className="p-1 rounded-full hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6">
+                <p className="text-sm text-gray-300">
+                  Are you sure you want to delete <span className="font-semibold text-white">{websiteToDelete.name}</span>? This action cannot be undone.
+                </p>
+              </div>
+              <div className="p-4 border-t border-gray-800 flex justify-end gap-3">
+                <SecondaryButton
+                  onClick={() => {
+                    setIsDeleteModalOpen(false);
+                    setWebsiteToDelete(null);
+                  }}
+                  className="px-4 py-2 text-sm"
+                >
+                  Cancel
+                </SecondaryButton>
+                <PrimaryButton
+                  onClick={confirmDeleteWebsite}
+                  className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500"
+                >
+                  Delete
+                </PrimaryButton>
+              </div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-pink-500"></div>
+              <div className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full bg-red-500/10 blur-3xl"></div>
+              <div className="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-pink-500/10 blur-3xl"></div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
         {[
@@ -387,7 +675,7 @@ const DashboardPage: React.FC = () => {
           <input
             type="text"
             placeholder="Search websites..."
-            className="block w-full pl-9 pr-3 py-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 border border-gray-700 text-sm text-white placeholder-gray-500 transition-all"
+            className="block w-full pl-9 pr-3 py-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-/AVI900 border border-gray-700 text-sm text-white placeholder-gray-500 transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -415,7 +703,12 @@ const DashboardPage: React.FC = () => {
           </div>
         ) : (
           filteredWebsites.map(website => (
-            <WebsiteCard key={website.id} website={website} compact />
+            <WebsiteCard 
+              key={website.id} 
+              website={website} 
+              compact 
+              onDelete={handleDeleteWebsite}
+            />
           ))
         )}
       </div>
@@ -430,9 +723,7 @@ const DashboardPage: React.FC = () => {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
-            {/* Chat window */}
             <div className="flex-1 rounded-t-2xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 shadow-2xl overflow-hidden flex flex-col">
-              {/* Chat header */}
               <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="relative w-8 h-8">
@@ -457,7 +748,6 @@ const DashboardPage: React.FC = () => {
                 </button>
               </div>
               
-              {/* Messages area */}
               <div className="flex-1 p-4 overflow-y-auto space-y-3">
                 {messages.length === 0 ? (
                   <div className="text-center text-gray-400 text-sm py-8">
@@ -496,7 +786,6 @@ const DashboardPage: React.FC = () => {
                 <div ref={messagesEndRef} />
               </div>
               
-              {/* Input area */}
               <div className="p-3 border-t border-gray-700 bg-gray-800/50 backdrop-blur-sm">
                 <div className="flex space-x-2">
                   <input
@@ -525,7 +814,6 @@ const DashboardPage: React.FC = () => {
               </div>
             </div>
             
-            {/* 3D effect layers */}
             <div className="absolute -inset-1 rounded-2xl border border-blue-400/30 transform rotate-1 -z-10"></div>
             <div className="absolute -inset-2 rounded-2xl border border-blue-400/20 transform rotate-3 -z-20"></div>
             <div className="absolute -inset-3 rounded-2xl border border-blue-400/10 transform rotate-6 -z-30"></div>
@@ -536,7 +824,6 @@ const DashboardPage: React.FC = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
-            {/* Floating particles */}
             {[...Array(8)].map((_, i) => (
               <motion.div
                 key={i}
@@ -561,10 +848,8 @@ const DashboardPage: React.FC = () => {
               />
             ))}
             
-            {/* Glow effect */}
             <div className="absolute inset-0 rounded-full bg-blue-500/20 blur-xl animate-pulse"></div>
             
-            {/* Main 3D orb */}
             <motion.div
               className="relative w-20 h-20 cursor-pointer"
               onClick={() => setIsChatOpen(true)}
@@ -576,18 +861,13 @@ const DashboardPage: React.FC = () => {
                 ease: "linear"
               }}
             >
-              {/* Outer glass layer */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-600/20 border border-white/10 shadow-2xl backdrop-blur-sm overflow-hidden">
-                {/* Inner core */}
                 <div className="absolute inset-2 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                  {/* Face */}
                   <div className="relative w-8 h-8">
-                    {/* Eyes */}
                     <div className="absolute top-1 left-0 w-2 h-2 bg-white rounded-full flex justify-between">
                       <div className="w-1 h-1 bg-blue-800 rounded-full animate-blink"></div>
                       <div className="w-1 h-1 bg-blue-800 rounded-full animate-blink" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    {/* Mouth */}
                     <motion.div 
                       className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-1.5 bg-blue-800 rounded-b-full"
                       animate={{
@@ -601,7 +881,6 @@ const DashboardPage: React.FC = () => {
                     ></motion.div>
                   </div>
                   
-                  {/* Floating dots */}
                   {[...Array(5)].map((_, i) => (
                     <motion.div
                       key={i}
@@ -626,14 +905,11 @@ const DashboardPage: React.FC = () => {
                   ))}
                 </div>
                 
-                {/* Shine effect */}
                 <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-white/10 rounded-tl-full pointer-events-none"></div>
                 
-                {/* Reflection */}
                 <div className="absolute top-2 right-2 w-4 h-4 bg-white/20 rounded-full blur-sm"></div>
               </div>
               
-              {/* Floating ring */}
               <motion.div
                 className="absolute -inset-4 rounded-full border border-white/20 pointer-events-none"
                 animate={{

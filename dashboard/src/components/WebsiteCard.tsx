@@ -2,16 +2,18 @@
 
 import React, { useState } from 'react';
 import { Website } from '../types';
-import { ChevronDown, ChevronUp, Clock, ExternalLink, BarChart2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, ExternalLink, BarChart2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '../lib/utils'; // Make sure this path matches your project structure
+import { cn } from '../lib/utils';
+import { SecondaryButton } from './Button'; // Assuming you extract SecondaryButton to a separate file
 
 interface WebsiteCardProps {
   website: Website;
   compact?: boolean;
+  onDelete?: (id: string) => void; // Add onDelete prop
 }
 
-const WebsiteCard: React.FC<WebsiteCardProps> = ({ website, compact = false }) => {
+const WebsiteCard: React.FC<WebsiteCardProps> = ({ website, compact = false, onDelete }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -52,6 +54,17 @@ const WebsiteCard: React.FC<WebsiteCardProps> = ({ website, compact = false }) =
                 <Clock size={12} className="inline mr-1" />
                 {lastCheckedTime}
               </div>
+            )}
+            {onDelete && (
+              <SecondaryButton 
+                icon={X}
+                className="p-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(website.id);
+                }}
+                title="Delete website"
+              />
             )}
             <button 
               className="p-1 rounded-full hover:bg-gray-800/50 text-gray-400 hover:text-white transition-colors"
