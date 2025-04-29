@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Activity, Bell, Shield, ArrowRight, CheckCircle, Server, Zap, HeartPulse, AlertTriangle, ChevronRight } from 'lucide-react';
 import * as THREE from 'three';
 import { cn } from '../lib/utils';
+import { ButtonProps } from '../types'; // Import ButtonProps from your type file
 
 const LandingPage = () => {
   const [loading, setLoading] = useState(true);
@@ -196,7 +197,9 @@ const LandingPage = () => {
       
       linePositions[lineIndex++] = posArray[p1 * 3];
       linePositions[lineIndex++] = posArray[p1 * 3 + 1];
-      linePositions[lineIndex++] = posArray[p1 * 3 + 2];
+      linePositions[lineIndex++] = posArray[p1 * 3
+
+ + 2];
       
       linePositions[lineIndex++] = posArray[p2 * 3];
       linePositions[lineIndex++] = posArray[p2 * 3 + 1];
@@ -262,12 +265,7 @@ const LandingPage = () => {
     iconPosition = 'right',
     size = 'default',
     ...props 
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { 
-    className?: string;
-    icon?: React.ComponentType<{ size?: number; className?: string }>;
-    iconPosition?: 'left' | 'right';
-    size?: 'sm' | 'default' | 'lg';
-  }) => {
+  }: ButtonProps) => {
     const sizeClasses = {
       sm: 'px-4 py-2 text-sm',
       default: 'px-6 py-3',
@@ -316,12 +314,7 @@ const LandingPage = () => {
     iconPosition = 'right',
     size = 'default',
     ...props 
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { 
-    className?: string;
-    icon?: React.ComponentType<{ size?: number; className?: string }>;
-    iconPosition?: 'left' | 'right';
-    size?: 'sm' | 'default' | 'lg';
-  }) => {
+  }: ButtonProps) => {
     const sizeClasses = {
       sm: 'px-4 py-2 text-sm',
       default: 'px-6 py-3',
@@ -370,12 +363,7 @@ const LandingPage = () => {
     iconPosition = 'right',
     size = 'default',
     ...props 
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { 
-    className?: string;
-    icon?: React.ComponentType<{ size?: number; className?: string }>;
-    iconPosition?: 'left' | 'right';
-    size?: 'sm' | 'default' | 'lg';
-  }) => {
+  }: ButtonProps) => {
     const sizeClasses = {
       sm: 'px-4 py-2 text-sm',
       default: 'px-6 py-3',
@@ -420,12 +408,7 @@ const LandingPage = () => {
     iconPosition = 'right',
     size = 'default',
     ...props 
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { 
-    className?: string;
-    icon?: React.ComponentType<{ size?: number; className?: string }>;
-    iconPosition?: 'left' | 'right';
-    size?: 'sm' | 'default' | 'lg';
-  }) => {
+  }: ButtonProps) => {
     const sizeClasses = {
       sm: 'px-4 py-2 text-sm',
       default: 'px-6 py-3',
@@ -472,12 +455,7 @@ const LandingPage = () => {
     iconPosition = 'right',
     size = 'default',
     ...props 
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { 
-    className?: string;
-    icon?: React.ComponentType<{ size?: number; className?: string }>;
-    iconPosition?: 'left' | 'right';
-    size?: 'sm' | 'default' | 'lg';
-  }) => {
+  }: ButtonProps) => {
     const sizeClasses = {
       sm: 'px-4 py-2 text-sm',
       default: 'px-6 py-3',
@@ -685,7 +663,7 @@ const LandingPage = () => {
                 key={index}
                 name={service.name}
                 status={service.status}
-                uptime={service.uptime}
+                uptime={service.status}
                 responseTime={service.responseTime}
               />
             ))}
@@ -849,7 +827,7 @@ const LandingPage = () => {
                   >
                     <motion.div 
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm backdrop-blur-sm"
-                      initial={{ opacity: 0, y: -20 }}
+                      initial  initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.5 }}
                     >
@@ -997,7 +975,8 @@ const LandingPage = () => {
                       viewport={{ once: true }}
                       whileHover={{ y: -5 }}
                     >
-                      <div className={`p-3 bg-${feature.color}-500/10 rounded-full w-fit mb-6`}>
+                      <div className={`p-3 bg-${feature.color}-500/10圍
+rounded-full w-fit mb-6`}>
                         {feature.icon}
                       </div>
                       <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>

@@ -132,17 +132,19 @@ const Navbar: React.FC = () => {
   return (
     <>
       {/* Spacer div to prevent content hiding */}
-      <div className={cn(
-        "h-16 transition-all duration-300",
-        isScrolled ? "md:h-16" : "md:h-20"
-      )} />
+      <div
+        className={cn(
+          'h-16 transition-all duration-300',
+          isScrolled ? 'md:h-16' : 'md:h-20'
+        )}
+      />
       
       <motion.nav
         className={cn(
           'fixed top-0 left-0 w-full z-50 transition-all duration-300 text-white',
           isScrolled
-            ? 'bg-black/80 backdrop-blur-xl border-b border-gray-800/50 shadow-2xl py-3'
-            : 'bg-black/60 backdrop-blur-md py-4'
+            ? 'bg-black/90 backdrop-blur-2xl shadow-xl py-3'
+            : 'bg-black/60 backdrop-blur-lg py-4'
         )}
         animate={{ y: isNavbarVisible ? 0 : '-100%' }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -184,7 +186,7 @@ const Navbar: React.FC = () => {
                     appearance={{
                       elements: {
                         userButtonAvatarBox: 'w-8 h-8 glow',
-                        userButtonPopoverCard: 'bg-black/80 backdrop-blur-xl border border-gray-800/50 text-white',
+                        userButtonPopoverCard: 'bg-black/90 backdrop-blur-2xl border border-gray-900 text-white',
                         userButtonPopoverActionButtonText: 'text-white',
                         userButtonPopoverActionButton: 'hover:bg-gray-800/90 glow-button',
                       }
@@ -196,7 +198,7 @@ const Navbar: React.FC = () => {
                 <SignedOut>
                   <SignInButton mode="modal">
                     <motion.button
-                      className="px-4 py-2 rounded-md text-sm font-medium text-white bg-black/80 border border-gray-800/50 hover:bg-gray-800/90 glow-button transform-gpu"
+                      className="px-4 py-2 rounded-md text-sm font-medium text-white bg-black/80 border border-gray-900 hover:bg-gray-800/90 glow-button transform-gpu"
                       whileHover={{ scale: 1.05, rotate: 3 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -219,7 +221,7 @@ const Navbar: React.FC = () => {
             {/* Mobile Menu Button */}
             <div className="flex items-center gap-4 md:hidden">
               <motion.button
-                className="p-3 rounded-full bg-black/80 border border-gray-800/50 shadow-2xl glow-button transform-gpu"
+                className="p-3 rounded-full bg-black/80 border border-gray-900 shadow-xl glow-button transform-gpu"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 whileHover={{ scale: 1.1, rotate: 10 }}
                 whileTap={{ scale: 0.9 }}
@@ -242,7 +244,7 @@ const Navbar: React.FC = () => {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="md:hidden bg-black/95 backdrop-blur-lg border-t border-gray-800/50"
+                className="md:hidden bg-black/95 backdrop-blur-lg border-t border-gray-900"
               >
                 <div className="container mx-auto px-4 py-4">
                   {/* Navigation Links */}
@@ -261,7 +263,7 @@ const Navbar: React.FC = () => {
                   </ul>
                   
                   {/* Auth Buttons */}
-                  <div className="mt-4 pt-4 border-t border-gray-800/50 flex flex-col gap-3">
+                  <div className="mt-4 pt-4 border-t border-gray-900 flex flex-col gap-3">
                     <SignedIn>
                       <UserButton 
                         afterSignOutUrl="/"
@@ -269,7 +271,7 @@ const Navbar: React.FC = () => {
                           elements: {
                             userButtonTrigger: 'w-full justify-start py-2 px-4 hover:bg-gray-800/90 glow-button text-white',
                             userButtonAvatarBox: 'w-6 h-6 glow',
-                            userButtonPopoverCard: 'bg-black/80 backdrop-blur-xl border border-gray-800/50 text-white',
+                            userButtonPopoverCard: 'bg-black/90 backdrop-blur-2xl border border-gray-900 text-white',
                             userButtonPopoverActionButtonText: 'text-white',
                             userButtonPopoverActionButton: 'hover:bg-gray-800/90 glow-button',
                           }
@@ -280,7 +282,7 @@ const Navbar: React.FC = () => {
                     <SignedOut>
                       <SignInButton mode="modal">
                         <motion.button 
-                          className="w-full text-left py-2 px-4 rounded-md text-white bg-black/80 border border-gray-800/50 hover:bg-gray-800/90 glow-button transform-gpu"
+                          className="w-full text-left py-2 px-4 rounded-md text-white bg-black/80 border border-gray-900 hover:bg-gray-800/90 glow-button transform-gpu"
                           onClick={() => setIsMobileMenuOpen(false)}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}

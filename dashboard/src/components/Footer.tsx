@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
             >
               <Activity size={28} className="text-blue-400 glow" />
               <span className="text-2xl font-bold text-white">
-                PulseWatch
+                WebWatch
               </span>
             </motion.div>
             
@@ -135,7 +135,7 @@ const Footer: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
           viewport={{ once: true }}
         >
-          <p>&copy; {new Date().getFullYear()} PulseWatch. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} WebWatch. All rights reserved.</p>
           <div className="mt-4 md:mt-0 flex space-x-6">
             <a href="#" className="text-gray-500 hover:text-white transition-colors text-xs hover:underline">Privacy Policy</a>
             <a href="#" className="text-gray-500 hover:text-white transition-colors text-xs hover:underline">Terms of Service</a>

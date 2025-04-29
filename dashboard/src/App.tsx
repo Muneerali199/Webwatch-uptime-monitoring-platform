@@ -1,8 +1,8 @@
 "use client";
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ClerkProvider, ClerkLoaded, ClerkLoading } from '@clerk/clerk-react';
-import { Activity } from 'lucide-react';
 import LandingPage from './pages/LandingPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardPage from './pages/DashboardPage';
@@ -12,6 +12,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import LoadingScreen from './components/LoadingScreen';
 
 // Define environment variables type
 declare global {
@@ -52,14 +53,7 @@ function App() {
       >
         <Router>
           <ClerkLoading>
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
-              <div className="flex items-center space-x-2">
-                <Activity className="h-8 w-8 animate-spin text-blue-500" />
-                <span className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                  Loading...
-                </span>
-              </div>
-            </div>
+            <LoadingScreen />
           </ClerkLoading>
           <ClerkLoaded>
             <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
