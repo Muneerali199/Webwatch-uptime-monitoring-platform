@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NextUIProvider } from '@nextui-org/react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Activity, Bell, Shield, ArrowRight, CheckCircle, Server, Zap, HeartPulse, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Activity, Bell, Shield, ArrowRight, CheckCircle, Server, AlertTriangle, ChevronRight } from 'lucide-react';
 import * as THREE from 'three';
 import { cn } from '../lib/utils';
-import { ButtonProps } from '../types'; // Import ButtonProps from your type file
+import { ButtonProps } from '../types';
 
 const LandingPage = () => {
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,6 @@ const LandingPage = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  // Initialize stars and shooting stars
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500);
 
@@ -131,7 +130,6 @@ const LandingPage = () => {
     };
   }, []);
 
-  // 3D Particle Background
   useEffect(() => {
     const canvas = document.createElement('canvas');
     canvas.className = 'absolute inset-0 w-full h-full -z-10 opacity-30';
@@ -197,9 +195,7 @@ const LandingPage = () => {
       
       linePositions[lineIndex++] = posArray[p1 * 3];
       linePositions[lineIndex++] = posArray[p1 * 3 + 1];
-      linePositions[lineIndex++] = posArray[p1 * 3
-
- + 2];
+      linePositions[lineIndex++] = posArray[p1 * 3 + 2];
       
       linePositions[lineIndex++] = posArray[p2 * 3];
       linePositions[lineIndex++] = posArray[p2 * 3 + 1];
@@ -248,7 +244,6 @@ const LandingPage = () => {
     };
   }, []);
 
-  // Skeleton Loader
   const SkeletonLoader = ({ className = '' }: { className?: string }) => (
     <div className={cn(
       "animate-pulse bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900",
@@ -257,7 +252,6 @@ const LandingPage = () => {
     )} />
   );
 
-  // Beautiful Button Components
   const PrimaryButton = ({ 
     children, 
     className = '', 
@@ -493,7 +487,6 @@ const LandingPage = () => {
     );
   };
 
-  // Status Indicator Component
   const StatusIndicator = ({ status }: { status: 'operational' | 'degraded' | 'down' }) => {
     const statusConfig = {
       operational: {
@@ -532,7 +525,6 @@ const LandingPage = () => {
     );
   };
 
-  // Service Status Card Component
   const ServiceStatusCard = ({ 
     name, 
     status, 
@@ -592,7 +584,6 @@ const LandingPage = () => {
     );
   };
 
-  // System Status Component
   const SystemStatus = () => {
     const services = [
       { 
@@ -663,7 +654,7 @@ const LandingPage = () => {
                 key={index}
                 name={service.name}
                 status={service.status}
-                uptime={service.status}
+                uptime={service.uptime}
                 responseTime={service.responseTime}
               />
             ))}
@@ -684,7 +675,6 @@ const LandingPage = () => {
   return (
     <NextUIProvider>
       <div className="relative min-h-screen bg-black text-white overflow-hidden" ref={containerRef}>
-        {/* Star Background */}
         {stars.map(star => {
           if (star.speed === 0) {
             return (
@@ -750,7 +740,6 @@ const LandingPage = () => {
         <div id="particles-container" className="absolute inset-0 w-full h-full" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90"></div>
 
-        {/* Glowing background elements */}
         <div className="absolute inset-0 overflow-hidden -z-10">
           <motion.div 
             className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[200px]"
@@ -793,9 +782,7 @@ const LandingPage = () => {
           />
         </div>
 
-        {/* Main content */}
         <div className="relative z-10">
-          {/* Hero Section */}
           <section className="relative min-h-screen overflow-hidden flex items-center">
             <div className="container mx-auto px-4 py-32 relative z-10">
               {loading ? (
@@ -827,7 +814,7 @@ const LandingPage = () => {
                   >
                     <motion.div 
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm backdrop-blur-sm"
-                      initial  initial={{ opacity: 0, y: -20 }}
+                      initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.5 }}
                     >
@@ -906,7 +893,6 @@ const LandingPage = () => {
             </div>
           </section>
 
-          {/* Features Section */}
           <section className="py-16 md:py-24 bg-black/80 backdrop-blur-sm">
             <div className="container mx-auto px-4">
               {loading ? (
@@ -975,8 +961,7 @@ const LandingPage = () => {
                       viewport={{ once: true }}
                       whileHover={{ y: -5 }}
                     >
-                      <div className={`p-3 bg-${feature.color}-500/10圍
-rounded-full w-fit mb-6`}>
+                      <div className={`p-3 bg-${feature.color}-500/10 rounded-full w-fit mb-6`}>
                         {feature.icon}
                       </div>
                       <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
@@ -988,7 +973,6 @@ rounded-full w-fit mb-6`}>
             </div>
           </section>
 
-          {/* Pricing Section */}
           <section className="py-16 md:py-24 bg-black/90 backdrop-blur-md">
             <div className="container mx-auto px-4">
               {loading ? (
@@ -1122,7 +1106,6 @@ rounded-full w-fit mb-6`}>
             </div>
           </section>
 
-          {/* CTA Section */}
           <section className="py-16 md:py-24 bg-gradient-to-r from-blue-900/70 to-indigo-900/70 relative overflow-hidden">
             <div className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] opacity-20 pointer-events-none"
               style={{
@@ -1196,7 +1179,6 @@ rounded-full w-fit mb-6`}>
         </div>
       </div>
 
-      {/* Global styles */}
       <style jsx global>{`
         @keyframes shimmer {
           0% { background-position: -200% 0; }
