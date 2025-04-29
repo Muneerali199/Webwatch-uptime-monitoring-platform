@@ -1,4 +1,5 @@
-import { ComponentType } from 'react';
+import {  ReactNode } from 'react';
+import { LucideIcon } from 'lucide-react';
 
 // Website and UptimeRecord interfaces (unchanged)
 export interface Website {
@@ -21,9 +22,9 @@ export interface UptimeRecord {
 // Types for Button component with icon support
 export interface ButtonProps {
   className?: string;
-  icon?: ComponentType<{ size?: number; className?: string }>;
+  icon?: LucideIcon | null | undefined; // Allow null and undefined to fix TypeScript error
   iconPosition?: 'left' | 'right';
   size?: 'default' | 'sm' | 'lg';
-  children?: React.ReactNode;
+  children?: ReactNode;
   [key: string]: any; // For other HTML button attributes
 }
