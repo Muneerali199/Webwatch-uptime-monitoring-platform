@@ -19,6 +19,7 @@ import { SearchBar } from '../components/SearchBar';
 import Chatbot from '../components/Chatbot';
 import { Website } from '../types';
 
+// Define types for better type safety
 type Tab = 'overview' | 'performance' | 'incidents';
 
 interface Incident {
@@ -28,10 +29,17 @@ interface Incident {
 }
 
 const DashboardPage: React.FC = () => {
+  // State management for websites data
   const [websites, setWebsites] = useState<Website[]>(mockWebsites);
+  
+  // State for search functionality
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // UI states
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  
+  // Add website modal states
   const [isAddWebsiteOpen, setIsAddWebsiteOpen] = useState(false);
   const [newWebsite, setNewWebsite] = useState({
     name: '',
@@ -41,17 +49,21 @@ const DashboardPage: React.FC = () => {
     name: '',
     url: ''
   });
+  
+  // Delete modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [websiteToDelete, setWebsiteToDelete] = useState<Website | null>(null);
+  
+  // Ref for handling clicks outside modals
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Filtered websites
+  // Filter websites based on search query (name or URL)
   const filteredWebsites = websites.filter(website => 
     website.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     website.url.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Metrics calculations
+  // Calculate dashboard metrics
   const totalWebsites = websites.length;
   const operationalWebsites = websites.filter(w => w.status === 'up').length;
   const averageUptime = websites.reduce((acc, site) => acc + site.uptime, 0) / totalWebsites;
@@ -59,14 +71,14 @@ const DashboardPage: React.FC = () => {
     acc + site.history.filter(record => record.status === 'down').length, 0
   );
 
-  // Performance data
+  // Prepare performance data for the chart
   const performanceData = websites.map(website => ({
     name: website.name,
     responseTime: website.responseTime,
     uptime: website.uptime
   }));
 
-  // Recent incidents
+  // Get recent incidents from all websites
   const recentIncidents: Incident[] = websites
     .flatMap(website => 
       website.history
@@ -78,16 +90,18 @@ const DashboardPage: React.FC = () => {
         }))
     )
     .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-    .slice(0, 5);
+    .slice(0, 5); // Show only 5 most recent incidents
 
-  // Handlers
+  // Handle refresh action
   const handleRefresh = () => {
     setIsRefreshing(true);
+    // Simulate refresh with timeout
     setTimeout(() => {
       setIsRefreshing(false);
     }, 1000);
   };
 
+  // Handle delete website action
   const handleDeleteWebsite = (id: string) => {
     const website = websites.find(w => w.id === id);
     if (website) {
@@ -96,6 +110,7 @@ const DashboardPage: React.FC = () => {
     }
   };
 
+  // Confirm and execute website deletion
   const confirmDeleteWebsite = () => {
     if (websiteToDelete) {
       setWebsites(prev => prev.filter(website => website.id !== websiteToDelete.id));
@@ -104,31 +119,34 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  // Form validation and submission
+  // Validate the add website form
   const validateForm = () => {
-    let valid = true;
-    const newErrors = {
+    let isValid = true;
+    const errors = {
       name: '',
       url: ''
     };
 
+    // Check name field
     if (!newWebsite.name.trim()) {
-      newErrors.name = 'Website name is required';
-      valid = false;
+      errors.name = 'Website name is required';
+      isValid = false;
     }
 
+    // Check URL field
     if (!newWebsite.url.trim()) {
-      newErrors.url = 'Website URL is required';
-      valid = false;
+      errors.url = 'Website URL is required';
+      isValid = false;
     } else if (!isValidUrl(newWebsite.url)) {
-      newErrors.url = 'Please enter a valid URL (include http:// or https://)';
-      valid = false;
+      errors.url = 'Please enter a valid URL (include http:// or https://)';
+      isValid = false;
     }
 
-    setFormErrors(newErrors);
-    return valid;
+    setFormErrors(errors);
+    return isValid;
   };
 
+  // Simple URL validation
   const isValidUrl = (url: string) => {
     try {
       new URL(url);
@@ -138,31 +156,35 @@ const DashboardPage: React.FC = () => {
     }
   };
 
+  // Add a new website to the list
   const handleAddWebsite = () => {
     if (!validateForm()) return;
 
+    // Create new website object with mock data
     const newSite: Website = {
-      id: `site-${Date.now()}`,
+      id: `site-${Date.now()}`, // Generate unique ID
       name: newWebsite.name,
       url: newWebsite.url,
-      status: 'up',
-      uptime: 99.9,
-      responseTime: Math.floor(Math.random() * 200) + 100,
+      status: 'up', // Default status
+      uptime: 99.9, // Mock uptime
+      responseTime: Math.floor(Math.random() * 200) + 100, // Random response time
       lastChecked: new Date().toISOString(),
-      history: [
-        {
-          timestamp: new Date().toISOString(),
-          status: 'up',
-          responseTime: Math.floor(Math.random() * 200) + 100
-        }
-      ]
+      history: [{
+        timestamp: new Date().toISOString(),
+        status: 'up',
+        responseTime: Math.floor(Math.random() * 200) + 100
+      }]
     };
 
+    // Add new website to the list
     setWebsites(prev => [...prev, newSite]);
+    // Reset form
     setNewWebsite({ name: '', url: '' });
+    // Close modal
     setIsAddWebsiteOpen(false);
   };
 
+  // Handle input changes in the add website form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewWebsite(prev => ({
@@ -170,6 +192,7 @@ const DashboardPage: React.FC = () => {
       [name]: value
     }));
 
+    // Clear error if field is now valid
     if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors(prev => ({
         ...prev,
@@ -178,13 +201,10 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  // Click outside handler
+  // Handle clicks outside modals to close them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         if (isAddWebsiteOpen) {
           setIsAddWebsiteOpen(false);
         } else if (isDeleteModalOpen) {
@@ -203,7 +223,7 @@ const DashboardPage: React.FC = () => {
     };
   }, [isAddWebsiteOpen, isDeleteModalOpen]);
 
-  // Tabs content
+  // Render different content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -252,7 +272,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 h-[calc(100vh-64px)] overflow-y-auto">
-      {/* Header */}
+      {/* Header section with title and add button */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
@@ -269,7 +289,7 @@ const DashboardPage: React.FC = () => {
         </PrimaryButton>
       </div>
 
-      {/* Modals */}
+      {/* Modals for adding and deleting websites */}
       <AddWebsiteModal
         isOpen={isAddWebsiteOpen}
         onClose={() => setIsAddWebsiteOpen(false)}
@@ -289,7 +309,7 @@ const DashboardPage: React.FC = () => {
         onConfirm={confirmDeleteWebsite}
       />
 
-      {/* Tabs */}
+      {/* Tabs navigation */}
       <Tabs
         tabs={[
           { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -300,10 +320,10 @@ const DashboardPage: React.FC = () => {
         onTabChange={(tabId) => setActiveTab(tabId as Tab)}
       />
 
-      {/* Tab Content */}
+      {/* Tab content area */}
       {renderTabContent()}
 
-      {/* Search Bar */}
+      {/* Search and refresh controls */}
       <SearchBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -311,7 +331,7 @@ const DashboardPage: React.FC = () => {
         isRefreshing={isRefreshing}
       />
       
-      {/* Website Cards */}
+      {/* List of website cards */}
       <div className="space-y-3">
         {filteredWebsites.length === 0 ? (
           <div className="rounded-lg border border-gray-800 bg-gradient-to-b from-gray-900/30 to-gray-900/10 backdrop-blur-sm p-6 text-center text-sm text-gray-500">
@@ -329,6 +349,7 @@ const DashboardPage: React.FC = () => {
         )}
       </div>
 
+      {/* Chatbot component */}
       <Chatbot />
     </div>
   );
