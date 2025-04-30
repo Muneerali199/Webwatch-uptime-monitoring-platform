@@ -1,18 +1,17 @@
 "use client";
 
-import  { useState, useEffect, useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { NextUIProvider } from '@nextui-org/react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { StarsBackground } from '../components/landing/StarsBackground';
-
 import { HeroSection } from '../components/landing/HeroSection';
 import { FeaturesSection } from '../components/landing/FeaturesSection';
 import { PricingSection } from '../components/landing/PricingSection';
 import { CtaSection } from '../components/landing/CtaSection';
+import { UptimeWorldMap } from '../components/WorldMap';
 
 const LandingPage = () => {
-  const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true); // Initialize loading state
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -22,18 +21,68 @@ const LandingPage = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+  // Example data for the UptimeWorldMap component
+  const regions = [
+    {
+      location: { lat: 37.7749, lng: -122.4194 },
+      label: "San Francisco",
+      status: "up" as const,
+      lastChecked: new Date(),
+    },
+    {
+      location: { lat: 40.7128, lng: -74.0060 },
+      label: "New York",
+      status: "up" as const,
+      lastChecked: new Date(),
+    },
+    {
+      location: { lat: 51.5074, lng: -0.1278 },
+      label: "London",
+      status: "degraded" as const,
+      lastChecked: new Date(),
+    },
+    {
+      location: { lat: 35.6762, lng: 139.6503 },
+      label: "Tokyo",
+      status: "up" as const,
+      lastChecked: new Date(),
+    },
+    {
+      location: { lat: 48.8566, lng: 2.3522 },
+      label: "Paris",
+      status: "down" as const,
+      lastChecked: new Date(),
+    },
+    {
+      location: { lat: -33.8688, lng: 151.2093 },
+      label: "Sydney",
+      status: "up" as const,
+      lastChecked: new Date(),
+    },
+  ];
+
+  // Example user location (optional)
+  const userLocation = {
+    lat: 0,
+    lng: 0,
+    label: "Your Location",
+  };
+
+  // Simulate content loading
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <NextUIProvider>
-      <div className="relative min-h-screen bg-black text-white overflow-hidden" ref={containerRef}>
-        <StarsBackground />
-        <div id="particles-container" className="absolute inset-0 w-full h-full" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90"></div>
+      <div className="relative min-h-[100vh] bg-black text-white overflow-hidden" ref={containerRef}>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-black/70 to-black/90"></div>
 
+        {/* Background animated elements */}
         <div className="absolute inset-0 overflow-hidden -z-10">
           <motion.div 
             className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[200px]"
@@ -76,8 +125,30 @@ const LandingPage = () => {
           />
         </div>
 
+        {/* Main content */}
         <div className="relative z-10">
-          <HeroSection loading={loading} />
+          <HeroSection />
+          
+          {/* UptimeWorldMap Section */}
+          <section className="py-20 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-600 mb-4">
+                  Global Reach
+                </h2>
+                <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                  Connecting people and businesses across the world with our seamless technology.
+                </p>
+              </div>
+              <UptimeWorldMap 
+                regions={regions}
+                userLocation={userLocation}
+                lineColor="#6366f1" // indigo-500
+                pulseIntensity={1}
+              />
+            </div>
+          </section>
+
           <FeaturesSection loading={loading} />
           <PricingSection loading={loading} />
           <CtaSection loading={loading} />
@@ -85,6 +156,16 @@ const LandingPage = () => {
       </div>
 
       <style jsx global>{`
+        body {
+          margin: 0;
+          padding: 0;
+          background-color: black;
+        }
+        html, body, #__next {
+          height: 100%;
+          width: 100%;
+          overflow-x: hidden;
+        }
         @keyframes shimmer {
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
@@ -92,12 +173,6 @@ const LandingPage = () => {
         @keyframes shine {
           0% { transform: translateX(-100%) rotate(45deg); }
           100% { transform: translateX(100%) rotate(45deg); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite linear;
-        }
-        .animate-shine {
-          animation: shine 3s infinite;
         }
       `}</style>
     </NextUIProvider>
