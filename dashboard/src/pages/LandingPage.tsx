@@ -11,7 +11,7 @@ import { UptimeWorldMap } from '../components/WorldMap';
 
 const LandingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(true); // Initialize loading state
+  const [loading, setLoading] = useState(true);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -68,11 +68,11 @@ const LandingPage = () => {
     label: "Your Location",
   };
 
-  // Simulate content loading
+  // Simulate loading completion
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1500);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -143,7 +143,7 @@ const LandingPage = () => {
               <UptimeWorldMap 
                 regions={regions}
                 userLocation={userLocation}
-                lineColor="#6366f1" // indigo-500
+                lineColor="#6366f1"
                 pulseIntensity={1}
               />
             </div>
